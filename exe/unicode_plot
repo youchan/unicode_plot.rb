@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+require "thor"
+require "unicode_plot"
+require "csv"
+
+class UniPlot < Thor
+  desc "barplot", "Show barplot"
+  def barplot
+    (labels, values) = $stdin.readlines.take(2).map{|l| CSV.parse_line(l)}
+    plot = UnicodePlot.barplot(labels, values.map(&:to_i))
+    render(plot)
+  end
+
+  desc "lineplot", "Show lineplot"
+  def lineplot
+    (x, y) = $stdin.readlines.take(2).map{|l| CSV.parse_line(l)}
+    plot = UnicodePlot.lineplot(x.map(&:to_i), y.map(&:to_i))
+    render(plot)
+  end
+
+  desc "histogram", "Show histogram"
+  def histogram
+    values = CSV.parse_line($stdin.readlines.first)
+    plot = UnicodePlot.histogram(values.map(&:to_f))
+    render(plot)
+  end
+
+  private
+  def render(plot)
+    plot.render($stdout)
+    puts
+  end
+end
+
+UniPlot.start
